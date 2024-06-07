@@ -7,9 +7,11 @@
 #include "stm32f4xx.h"                  // Device header
 
 #include "rtos.h"
-//temp
 
 extern int stdout_init (void);
+
+
+
 
 volatile uint32_t msTicks;                            /* counts 1ms timeTicks */
 /*----------------------------------------------------------------------------
@@ -74,6 +76,21 @@ void SystemCoreClockConfigure(void) {
   while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);  /* Wait till PLL is system clock src */
 }
 
+
+void OS_run(){
+	SystemCoreClockConfigure();                              /* configure HSI as System Clock */
+  SystemCoreClockUpdate();
+
+  SysTick_Config(SystemCoreClock / 1000);  	/* SysTick 1 msec interrupts */
+		
+	//RTOS SETUP
+	OSInit();
+	
+	//setting systick to highest priority
+	NVIC_SetPriority(SysTick_IRQn,0U);
+
+
+}
 
 //gpio setup
 #define PIN_PA10 (1U << 10)
@@ -145,20 +162,12 @@ int main (void) {
   int32_t max_num = LED_GetCount();
   int32_t num = 0;
 
-  SystemCoreClockConfigure();                              /* configure HSI as System Clock */
-  SystemCoreClockUpdate();
-
   LED_Initialize();
   Buttons_Initialize();
   stdout_init();                                           /* Initialize Serial interface */
 
-  SysTick_Config(SystemCoreClock / 1000);  	/* SysTick 1 msec interrupts */
 	
-	//RTOS SETUP
-	OSInit();
-	//setting systick to highest priority
-	NVIC_SetPriority(SysTick_IRQn,0U);
-	
+
 	
 	//setting up stacks
 	uint32_t* b1sp=&stack[0][0];
@@ -175,6 +184,10 @@ int main (void) {
 	
 	//temp
 	GPIO_Init();
+	
+	//clock setup to prevent scheduling during setup
+
+	OS_run();
 	
 	
   for (;;) {
