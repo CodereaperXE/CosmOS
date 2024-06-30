@@ -2,6 +2,7 @@
 ".\flash\stdout_usart.o"
 ".\flash\rtos.o"
 ".\flash\main.o"
+".\flash\bsp.o"
 ".\flash\buttons_nucleo-f446re.o"
 ".\flash\led_nucleo-f446re.o"
 ".\flash\retarget_io.o"

@@ -13,10 +13,11 @@ volatile extern int ThreadCount;
 extern uint32_t stack[MAX_THREADS][256];
 
 
+
 //thread control block
 typedef struct TCB{
-	uint32_t *sp;
-	struct TCB *next;
+	uint32_t *sp; //saved stack pointer
+	uint32_t timeout; //thread delay 
 }TCB;
 
 //thread list
@@ -43,13 +44,19 @@ void OSThreadInit(
 									uint32_t 
 );
 
+//os idle thread
+void IdleThread(void);
+
 //os init
 void OSInit(void);
 
 //os scheduler
 void OS_Scheduler(void);
 
-
+//os delay
+void OS_Delay(uint32_t ticks);
+//os tick
+void OS_Tick(void);
 #endif //RTOS_H
 
 
